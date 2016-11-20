@@ -1,30 +1,59 @@
 $(document).ready(function() {
-  // deck = shuffle(deck);
-  // deal(deck);
-  hand = [{ rank: 'A', type: 'H' },{ rank: '2', type: 'H' },{ rank: '3', type: 'H' },{ rank: '4', type: 'H' }, { rank: '5', type: 'H' }];
-  appendHand(hand);
-  console.log("One pair: " + onePair(hand));
-  console.log("Two Pair: " + twoPair(hand));
-  console.log("3 of a kind: " + threeOfAKind(hand));
-  console.log("Quads: " + quads(hand));
-  console.log("Full House: " + fullHouse(hand));
-  console.log("Straight: " + straight(hand));
-  console.log("Flush: " + flush(hand));
-  console.log("Straight Flush: " + straightFlush(hand));
-  console.log("Royal Flush: " + royalFlush(hand));
+  deck = shuffle(deck);
+  deal(deck);
+  // hand = [{ rank: 'A', type: 'H' },{ rank: 'A', type: 'H' },{ rank: 'A', type: 'H' },{ rank: 'J', type: 'H' }, { rank: 'J', type: 'C' }];
+  appendHand(hand1, hand2);
+  console.log("Hand 1: " + checkAllRanks(hand1));
+  console.log("Hand 2: " + checkAllRanks(hand2));
+  console.log('Winner: ' + compareHands(checkAllRanks(hand1), checkAllRanks(hand2)));
+
+  // console.log("Two Pair: " + twoPair(hand));
+  // console.log("3 of a kind: " + threeOfAKind(hand));
+  // console.log("Quads: " + quads(hand));
+  // console.log("Full House: " + fullHouse(hand));
+  // console.log("Straight: " + straight(hand));
+  // console.log("Flush: " + flush(hand));
+  // console.log("Straight Flush: " + straightFlush(hand));
+  // console.log("Royal Flush: " + royalFlush(hand));
 });
 
 
-function appendHand(hand) {
+function appendHand(hand1, hand2) {
   $('.hand-container').empty();
-  for (var i = 0; i < hand.length; i++) {
-    $('.hand-container').append('<p>' + hand[i].rank + hand[i].type + '</p>');
+  $('.hand-container').append('<p>Hand One</p>');
+  for (var i = 0; i < hand1.length; i++) {
+    $('.hand-container').append('<p>' + hand1[i].rank + hand1[i].type + '</p>');
+  }
+  $('.hand-container').append('<p>Hand Two</p>');
+  for (var i = 0; i < hand2.length; i++) {
+    $('.hand-container').append('<p>' + hand2[i].rank + hand2[i].type + '</p>');
   }
 }
 
+// function findWinner(hand1, hand2) {
+//   if (hand1[0] === true && hand2[0] === true) {
+//     if (hand1[1] > hand2[1]) {
+//       return 'hand one';
+//     } else {
+//       return 'hand two';
+//     }
+//   }
+//   else if (hand1[0] === true && hand2[0] === false) {
+//     return 'hand one';
+//   }
+//   else if (hand2[0] === true && hand1[0] === false) {
+//     return 'hand two';
+//   }
+//   else {
+//     return 'no pair';
+//   }
+// }
+
 var rank = [];
 
-var hand = [];
+var hand1 = [];
+var hand2 = [];
+var isWheelStraight = false;
 
 function shuffle (deck) {
   var i = 0
@@ -42,7 +71,10 @@ function shuffle (deck) {
 
 function deal(deck) {
   for (var i = 0; i < 5; i++) {
-    hand.push(deck[i]);
+    hand1.push(deck[i]);
+  }
+  for (var i = 5; i < 10; i++) {
+    hand2.push(deck[i]);
   }
 }
 
@@ -50,7 +82,7 @@ function deal(deck) {
 //hand will be array with 5 objects
 //evaluate whether a hand has one pair and get the value of the pair
 function onePair(hand) {
-  var value;
+  var value = [];
   var result = false;
   var pair = 0;
   for (var i = 0; i < hand.length; i++) {
@@ -59,7 +91,7 @@ function onePair(hand) {
         continue;
       } else {
         if (hand[i].rank === hand[j].rank){
-        value = hand[i].rank;
+        value.push(hand[i].rank);
         pair++;
         }
       }
@@ -68,7 +100,7 @@ function onePair(hand) {
   // console.log(pair);
   if (pair === 2) {
     result = true;
-    console.log(value);
+    // console.log(value);
   }
   return result;
 }
@@ -193,8 +225,12 @@ function straight(hand) {
   }
   rank.sort(function(a, b){return a-b});
   for (var i = 0; i < rank.length -1; i++) {
-    if (rank[i] + 1 !== rank[i + 1] && rank !== wheelStraight) {
-      console.log("wheelStraight " + wheelStraight + " rank " + rank);
+    if (rank.join('') == wheelStraight.join('')) {
+      isWheelStraight = true;
+      console.log(isWheelStraight);
+      break;
+    }
+    if (rank[i] + 1 !== rank[i + 1]) {
       straight = false;
     }
   }
@@ -214,7 +250,7 @@ function flush(hand) {
   return flush;
 }
 
-function straightFlush() {
+function straightFlush(hand) {
   var straightFlush = false;
   if (flush(hand) && straight(hand)) {
     straightFlush = true;
@@ -222,11 +258,72 @@ function straightFlush() {
   return straightFlush;
 }
 
-function royalFlush() {
-  if (straightFlush(hand) && rank[4] === 14) {
+function royalFlush(hand) {
+  if (straightFlush(hand) && rank[4] === 14 && isWheelStraight === false) {
     return true;
   } else {
     return false;
+  }
+}
+
+function pairChecker(hand) {
+  var value = 0;
+  var pair = 0;
+  for (var i = 0; i < hand.length; i++) {
+    for(var j = 0; j < hand.length; j++) {
+      if (j === i) {
+        continue;
+      } else {
+        if (hand[i].rank === hand[j].rank){
+        value = hand[i].rank;
+        pair++;
+        }
+      }
+    }
+  }
+  return [pair,value];
+}
+
+
+
+function checkAllRanks(hand) {
+  var rank = 0;
+  if (onePair(hand)) {
+    // console.log(onePair(hand));
+    rank = 1;
+  }
+  if (twoPair(hand)) {
+    rank = 2;
+  }
+  if (threeOfAKind(hand)) {
+    rank = 3;
+  }
+  if (straight(hand)) {
+    rank = 4;
+  }
+  if (flush(hand)) {
+    rank = 5;
+  }
+  if (fullHouse(hand)) {
+    rank = 6;
+  }
+  if (quads(hand)) {
+    rank = 7;
+  }
+  if (straightFlush(hand)) {
+    rank = 8;
+  }
+  if (royalFlush(hand)) {
+    rank = 9;
+  }
+  return rank;
+}
+
+function compareHands(hand1, hand2) {
+  if (hand1 > hand2) {
+    return 'Winner is hand 1';
+  } else {
+    return 'Winner is hand 2';
   }
 }
 
