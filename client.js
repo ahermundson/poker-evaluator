@@ -79,6 +79,10 @@ function deal(deck) {
 }
 
 
+/*
+FUNCTIONS TO DETERMINE TYPE OF HAND
+*/
+
 //hand will be array with 5 objects
 //evaluate whether a hand has one pair and get the value of the pair
 function onePair(hand) {
@@ -286,6 +290,11 @@ function pairChecker(hand) {
 
 
 
+/*
+END OF FUNCTIONS TO DETERMINE HAND
+*/
+
+
 function checkAllRanks(hand) {
   var rank = 0;
   if (onePair(hand)) {
@@ -319,13 +328,115 @@ function checkAllRanks(hand) {
   return rank;
 }
 
-function compareHands(hand1, hand2) {
-  if (hand1 > hand2) {
+function compareHands(handOne, handTwo) {
+  var rank = handOne;
+  if (handOne > handTwo) {
     return 'Winner is hand 1';
-  } else {
+  } else if (handOne === handTwo) {
+    // console.log("Check all ranks: " + checkAllRanks(handOne));
+    return 'Tiebreaker winner is ' + rankTieBreaker(rank, hand1, hand2);
+    console.log('same type of hand');
+  }
+  else {
     return 'Winner is hand 2';
   }
 }
+
+
+
+//if both players have the same hand
+function rankTieBreaker(rank, hand1, hand2) {
+  switch (rank) {
+    case 0:
+    console.log('Hand 1: ' + noPairHighCard(hand1) + ' Hand 2: ' + noPairHighCard(hand2));
+    if (Number(noPairHighCard(hand1)) > Number(noPairHighCard(hand2))) {
+      return 'High card winner is hand 1';
+    } else {
+      return 'High card winner is hand 2';
+    }
+    break;
+    case 1:
+    //find the higher pair. Both players could have the same pair
+    if (Number(onePairValue(hand1)) > Number(onePairValue(hand2))) {
+      return 'winner is hand 1';
+    } else if (Number(onePairValue(hand1)) < Number(onePairValue(hand2))) {
+      console.log(onePairValue(hand1) + ' ' + onePairValue(hand2));
+      return 'winner is hand 2';
+    } else {
+      return 'hand is a tie';
+    }
+    break;
+    case 2:
+    //find the higher pair in the two pair hand. Both players could share both pairs, one of the pairs or both have two different pairs
+    break;
+    case 3:
+    //find the higher of the three of a kind. Both players may have the same 3 of a kind
+    break;
+    case 4:
+    //find the higher straight. The array is sorted in the straight function so you could just test the last cell of the array. Both players could have the same straight
+    break;
+    case 5:
+    //find the higher flush. Sort the hands by rank and evaluate starting at the highest number. Once there is a difference, the hand with the higher rank wins.
+    break;
+    case 6:
+    //find the higher full house. First check the threeOfAKind then the pair.
+    break;
+    case 7:
+    //find the higher quads. Simply get the value from each
+    break;
+    case 8:
+    //find the higher straightFlush. See straight.
+    break;
+    case 9:
+    //if both have Royal Flush pot should be chopped.
+    break;
+  }
+}
+
+
+function noPairHighCard(hand) {
+  var rank = [];
+  for (var i = 0; i < hand.length; i++) {
+    switch(hand[i].rank) {
+      case 'A':
+      hand[i].rank = 14
+      break;
+      case 'K':
+      hand[i].rank = 13
+      break;
+      case 'Q':
+      hand[i].rank = 12
+      break;
+      case 'J':
+      hand[i].rank = 11;
+    }
+  rank.push(Number(hand[i].rank));
+  }
+  rank.sort(function(a, b){return a-b});
+  console.log('Sorted ?:', rank);
+  return rank[4];
+}
+
+
+function onePairValue(hand) {
+  var value;
+  for (var i = 0; i < hand.length; i++) {
+    for(var j = 0; j < hand.length; j++) {
+      if (j === i) {
+        continue;
+      } else {
+        if (hand[i].rank === hand[j].rank){
+        value = hand[i].rank;
+        return value;
+        }
+      }
+    }
+  }
+}
+
+
+
+
 
 var deck = [
   // hearts
